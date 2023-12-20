@@ -40,7 +40,17 @@ describe("El agente Poo Chie cambia a estado auxiliar y se verifica en el report
         cy.get('#ctl00_contentplaceholderContenido_textboxPassword').type('32!EWQdsa')
         cy.get('#sumbitLogin').click()
         cy.wait(3000)
-        cy.get('[rel="info"] > .fa').click()
+        cy.contains('Poo Chie')
+        .parent('tr')
+        .within(() => {
+          cy.xpath("//td[@style='white-space:nowrap;text-align:center']/a/span[@data-original-title='Ver más información de la actividad del agente']").click()
+
+        //cy.xpath("//td[@style='white-space:nowrap;text-align:center']/a/span[@data-original-title='Ver más información de la actividad del agente']")
+        // cy.xpath("//td[@style='font-weight:bold;white-space:normal']/a[contains(string(),'Poo Chie')]")
+        //   .within(() => {
+            
+        //   })
+        
         cy.get('tbody > :nth-child(2) > :nth-child(2)').should('include.text','[Almuerzo]')// es el texto en español, se rompió la traduccion
         cy.get('#ui-id-2').click()//solapa tiempos
         //cy.get('[class=highcharts-legend-item highcharts-pie-series highcharts-color-2 highcharts-legend-item-hidden]').should('have.text','Almuerzo')
@@ -50,6 +60,6 @@ describe("El agente Poo Chie cambia a estado auxiliar y se verifica en el report
       })
    
     })
-
+  })
  //ejemplo de xpath de poochie en reporte de agentes de tiempo real: $x("//td[@style='font-weight:bold;white-space:normal']/a[contains(string(),'Poo Chie')]")
   
