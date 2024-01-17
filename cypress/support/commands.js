@@ -61,3 +61,6 @@ Cypress.Commands.add("socialSupervisorLoginRgroisman",(username,password) =>
       cy.get('#sumbitLogin').click()
     })
   })
+
+  import 'cypress-file-upload';
+  

@@ -10,7 +10,17 @@ describe("El agente Poo Chie cambia a estado auxiliar y se verifica en el report
         //Falta acomodarlo para que lo haga con más agentes logueados, usar within
         cy.visit('https://qa.ysocial.net/Test/Reports/RTAgents.aspx')
         cy.wait(3000)
-        cy.get('[rel="disconnect"] > .fa').click()
+         //cy.xpath("//td/a[contains(string(),'Poo Chie')]/ancestor::tr/descendant::a[@rel='disconnect']").click()
+         cy.get('table[id="tableAgents"]')
+         .within(
+                 ()=>{cy.contains('Poo Chie').parents('tr')
+                       .within(
+                               ()=>{cy.get('a[rel="disconnect"]')
+                                   .click();}
+                               )
+                     }
+                )
+ 
         cy.xpath("//label[@class='uiButton uiButtonLarge uiButtonConfirm']/input[@type='button']").click()
         cy.wait(3000)
         cy.get('#cboxLoadedContent > .seccion > .contents > .message > table > tbody > tr > .text').should('include.text','Se desconectó el agente Poo Chie')
@@ -40,17 +50,20 @@ describe("El agente Poo Chie cambia a estado auxiliar y se verifica en el report
         cy.get('#ctl00_contentplaceholderContenido_textboxPassword').type('32!EWQdsa')
         cy.get('#sumbitLogin').click()
         cy.wait(3000)
-        cy.contains('Poo Chie')
-        .parent('tr')
-        .within(() => {
-          cy.xpath("//td[@style='white-space:nowrap;text-align:center']/a/span[@data-original-title='Ver más información de la actividad del agente']").click()
+        // cy.contains('Poo Chie')
+        // .parent('tr')
+        // .within(() => {
+        //   cy.xpath("//td[@style='white-space:nowrap;text-align:center']/a/span[@data-original-title='Ver más información de la actividad del agente']").click()
 
         //cy.xpath("//td[@style='white-space:nowrap;text-align:center']/a/span[@data-original-title='Ver más información de la actividad del agente']")
         // cy.xpath("//td[@style='font-weight:bold;white-space:normal']/a[contains(string(),'Poo Chie')]")
         //   .within(() => {
             
         //   })
+        //agarrar la tabla, ubicar nombre, ubicar la celda
         
+        cy.xpath("//td/a[contains(string(),'Poo Chie')]/ancestor::tr/descendant::a[@rel='info']").click()
+        //("//td[@style='white-space:nowrap;text-align:center']/a/span[@data-original-title='Ver más información de la actividad del agente']").click()
         cy.get('tbody > :nth-child(2) > :nth-child(2)').should('include.text','[Almuerzo]')// es el texto en español, se rompió la traduccion
         cy.get('#ui-id-2').click()//solapa tiempos
         //cy.get('[class=highcharts-legend-item highcharts-pie-series highcharts-color-2 highcharts-legend-item-hidden]').should('have.text','Almuerzo')
@@ -60,6 +73,7 @@ describe("El agente Poo Chie cambia a estado auxiliar y se verifica en el report
       })
    
     })
-  })
+
  //ejemplo de xpath de poochie en reporte de agentes de tiempo real: $x("//td[@style='font-weight:bold;white-space:normal']/a[contains(string(),'Poo Chie')]")
   
+ //revisar lo de desconectar pegandole al endpoint y revisar si hay para evaluar el dato del estado auxiliar
