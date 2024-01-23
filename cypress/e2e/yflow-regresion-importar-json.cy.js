@@ -38,7 +38,7 @@ Cypress.on("uncaught:exception", (err, runnable) => {
 
 
  describe("importación de un json", () => {
-     before('se loguea en yflow',() => {
+    before('se loguea en yflow',() => {
          cy.visit('https://yflow-qa.yoizen.com/')
          cy.get(':nth-child(1) > .form-control').type("rgroisman")
          cy.get(':nth-child(2) > .form-control').type("32!EWQdsa")
@@ -46,22 +46,63 @@ Cypress.on("uncaught:exception", (err, runnable) => {
          cy.wait(5000)
     })
 
-     it('importacion de un json de wa en uno de chat',() => {
-         cy.get('.fal').click()
-         cy.get('.input').type('chat importado cypress manual')
-         cy.get('select').first().select('0: 8')
-         cy.get('.action-button-default').click()
-         cy.wait(4000)
-         cy.get('img').click()
-         cy.wait(4000)
-         cy.get(':nth-child(2) > .flow > .dropdown > .dropdown-toggle > .fas').click()
-         cy.get(':nth-child(2) > .flow > .dropdown > .dropdown-menu > :nth-child(2)').click()
-         cy.get('.action-button-default')
-            .attachFile("cypress\cypress\fixtures\Flow Whatsapp (4).json")
-         cy.click()
-        
+    after('DELETE yflow via API', () => {
+      let flowId;
 
-
+      // Obtener la URL actual
+      cy.url().then((url) => {
+        // Dividir la URL por el carácter "/"
+        const urlParts = url.split('/');
+        // Obtener el último elemento de la matriz que debería ser el ID
+        flowId = urlParts[urlParts.length - 2];
+        // Imprimir el ID en la consola para verificar
+        cy.log(`El ID del flujo es: ${flowId}`);
+      
+        // Realizar la solicitud después de obtener el ID
+        cy.request({
+          method: 'DELETE',
+          url: `https://yflow-qa.yoizen.com/api/flows/false?id=${flowId}`,
+          headers: {
+            'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8veWZsb3cueW9pemVuLmNvbSIsIm5hbWUiOiJyZ3JvaXNtYW4iLCJ1aWQiOjExMiwiY2lkIjoxLCJjbmFtZSI6IkRlZmF1bHQiLCJzdXBlciI6ZmFsc2UsImFkbWluIjp0cnVlLCJlZGl0Ijp0cnVlLCJwdWJsaXNoIjp0cnVlLCJzZWVTdGF0aXN0aWNzIjp0cnVlLCJjYW5BY2Nlc3NZU21hcnQiOnRydWUsImNhblZhbGlkYXRlUGFzc3dvcmRzIjp0cnVlLCJsYW5nIjpudWxsLCJpYXQiOjE3MDYwMzUwOTR9.fmiGcYeplgPwTWvkdUZ1ZeMlWLoO4VtxhiYEEEgZULs',
+          }
+        }).then((response) => {
+          expect(response.status).to.equal(200);
+          expect(response.body.message).to.equal('Flow deleted');
+        });
+      });
+      
 
     })
- })
+
+    it('importacion de un json de wa en uno de chat',() => {
+      //se crea un flujo
+        cy.get('.fal').click()
+        cy.get('.input').type('chat importado cypress manual') //nombre del flujo creado
+        cy.get('select').first().select('0: 8') //selecciona tipo chat
+        cy.get('.action-button-default').click()
+        cy.wait(4000)
+        cy.get('img').click()
+        cy.wait(4000)
+        cy.get(':nth-child(2) > .flow > .dropdown > .dropdown-toggle > .fas').click()
+        cy.get(':nth-child(2) > .flow > .dropdown > .dropdown-menu > :nth-child(2)').click()
+        cy.xpath("//button[@class='action-button action-button-default']")
+              .should('be.visible')
+              .click()
+              .then(() => {
+                            Cypress.log({ message: 'Botón de carga cliqueado' });
+                            cy.xpath("//input[@type='file']").attachFile('Flow Whatsapp (4).json');//se importa el json tipo whats
+                            cy.contains('OK').click()
+                            cy.contains('Aceptar').click();});
+        cy.contains('Flow subido')
+
+        //asserts de piezas
+        cy.contains('chat importado cypress manual').click()//se abre el flujo creado
+        cy.xpath("//ui-switch[@color='#45c195']").invoke('click', { force: true });//click en switch de piezas avanzadas
+        cy.xpath("//app-button-menu-pieces[contains(string(),'Actualizar caso')]").should('exist');//ejemplo de pieza existente
+        cy.xpath("//app-button-menu-pieces[contains(string(),'Enviar HSM')]").should('not.exist')//pieza no existente
+        
+    });
+
+      
+  })
+
